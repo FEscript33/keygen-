@@ -3,14 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
+    <title>Key Generator</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        h1 { color: #3498db; }
+        /* Dark Theme Styles */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            color: #f1c40f; /* Yellow text for title */
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #1e88e5;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #1565c0;
+        }
+
+        #keyDisplay {
+            font-size: 18px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #222;
+            color: #0f0;
+            border-radius: 5px;
+            display: none; /* Hidden until a key is generated */
+        }
     </style>
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is my first website!</p>
+    <h1>Key Generator</h1>
+    <button onclick="generateKey()">Generate Key</button>
+    <div id="keyDisplay"></div>
+    <button id="copyButton" onclick="copyKey()" style="display: none;">Copy Key</button>
+
+    <script>
+        function generateKey() {
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let key = "";
+            for (let i = 0; i < 16; i++) {
+                key += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+
+            // Display the key
+            const keyDisplay = document.getElementById("keyDisplay");
+            keyDisplay.innerText = "Generated Key: " + key;
+            keyDisplay.style.display = "block";
+
+            // Show the copy button
+            const copyButton = document.getElementById("copyButton");
+            copyButton.style.display = "inline-block";
+
+            // Save the key for later use in copying
+            copyButton.dataset.key = key;
+        }
+
+        function copyKey() {
+            const copyButton = document.getElementById("copyButton");
+            const key = copyButton.dataset.key;
+
+            // Copy the key to the clipboard
+            navigator.clipboard.writeText(key).then(() => {
+                alert("Key copied to clipboard: " + key);
+            }).catch(err => {
+                alert("Failed to copy key: " + err);
+            });
+        }
+    </script>
 </body>
 </html>
+
