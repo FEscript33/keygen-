@@ -90,39 +90,58 @@
         <button class="button" onclick="toggleAdminPanel()">Close</button>
         <div id="adminControls" style="display: none;">
             <h3>Banned Scripts</h3>
-            <ul id="bannedScripts"></ul>
+            <ul id="bannedScripts">
+                <!-- Banned scripts will be shown here -->
+            </ul>
         </div>
     </div>
 
     <script>
-        const scripts = [];
-        const bannedScripts = [];
+        // Load previous scripts and login details from localStorage
+        window.onload = function() {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('loginCard').style.display = 'none';
+                document.getElementById('homepage').style.display = 'block';
+                renderScripts();
+            }
+        };
 
+        const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+        const bannedScripts = JSON.parse(localStorage.getItem('bannedScripts')) || [];
+
+        // Handle login
         function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+
             if (username && password) {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
                 document.getElementById('loginCard').style.display = 'none';
                 document.getElementById('homepage').style.display = 'block';
                 renderScripts();
             }
         }
 
+        // Show the upload page
         function showUploadPage() {
             document.getElementById('homepage').style.display = 'none';
             document.getElementById('uploadCard').style.display = 'block';
         }
 
+        // Show homepage
         function showHomePage() {
             document.getElementById('uploadCard').style.display = 'none';
             document.getElementById('homepage').style.display = 'block';
         }
 
+        // Toggle admin panel
         function toggleAdminPanel() {
             const panel = document.getElementById('adminPanel');
             panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
         }
 
+        // Validate admin password
         function validateAdmin() {
             const password = document.getElementById('adminPassword').value;
             if (password === '5324') {
@@ -132,6 +151,7 @@
             }
         }
 
+        // Handle file upload
         function handleUpload() {
             const scriptName = document.getElementById('scriptName').value;
             const keySystem = document.getElementById('keySystem').checked;
@@ -139,7 +159,6 @@
             const scriptContent = document.getElementById('scriptContent').value;
             const scriptFile = document.getElementById('scriptFile').files[0];
 
-            // No file type check; we simply use the file content
             if (scriptName && (scriptContent || scriptFile)) {
                 const script = {
                     name: scriptName,
@@ -147,16 +166,23 @@
                     keyLink,
                     content: scriptContent || scriptFile?.name
                 };
+
                 scripts.push(script);
+
+                // Save scripts to localStorage
+                localStorage.setItem('scripts', JSON.stringify(scripts));
+
                 alert('Script uploaded successfully!');
                 showHomePage();
                 renderScripts();
             }
         }
 
+        // Render scripts
         function renderScripts() {
             const scriptList = document.getElementById('scriptList');
             scriptList.innerHTML = '';
+
             scripts.forEach((script, index) => {
                 if (!bannedScripts.includes(script.name)) {
                     const scriptItem = document.createElement('div');
@@ -168,8 +194,12 @@
                     scriptList.appendChild(scriptItem);
                 }
             });
+
+            // Update banned scripts list in admin panel
+            updateBannedScripts();
         }
 
+        // Copy script to clipboard
         function copyScript(index) {
             const script = scripts[index].content;
             navigator.clipboard.writeText(script).then(() => {
@@ -177,11 +207,46 @@
             });
         }
 
+        // View script (warning about potential malicious content)
         function viewScript(index) {
             const script = scripts[index];
             alert(`Warning: Script may be malicious.\n\nScript Name: ${script.name}\nContent: ${script.content}`);
         }
 
+        // Ban a script
+        function banScript(scriptName) {
+            if (!bannedScripts.includes(scriptName)) {
+                bannedScripts.push(scriptName);
+                localStorage.setItem('bannedScripts', JSON.stringify(bannedScripts));
+                alert(`${scriptName} has been banned.`);
+                renderScripts();
+            }
+        }
+
+        // Update the banned scripts list in the admin panel
+        function updateBannedScripts() {
+            const bannedScriptsList = document.getElementById('bannedScripts');
+            bannedScriptsList.innerHTML = '';
+
+            bannedScripts.forEach((scriptName) => {
+                const bannedItem = document.createElement('li');
+                bannedItem.innerHTML = `<strong>${scriptName}</strong> <button class="button" onclick="unbanScript('${scriptName}')">Unban</button>`;
+                bannedScriptsList.appendChild(bannedItem);
+            });
+        }
+
+        // Unban a script
+        function unbanScript(scriptName) {
+            const index = bannedScripts.indexOf(scriptName);
+            if (index > -1) {
+                bannedScripts.splice(index, 1);
+                localStorage.setItem('bannedScripts', JSON.stringify(bannedScripts));
+                alert(`${scriptName} has been unbanned.`);
+                renderScripts();
+            }
+        }
+
+        // Load file content into textarea
         function loadFileContent() {
             const fileInput = document.getElementById('scriptFile');
             const textArea = document.getElementById('scriptContent');
@@ -195,6 +260,7 @@
             }
         }
 
+        // Event listener to show key link input
         document.getElementById('keySystem').addEventListener('change', function() {
             document.getElementById('keyLink').style.display = this.checked ? 'block' : 'none';
         });
