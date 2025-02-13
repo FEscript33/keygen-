@@ -3,52 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlock the Link</title>
+    <title>Key System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
             text-align: center;
-            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        .btn:disabled {
+            background-color: gray;
+            cursor: not-allowed;
         }
         .hidden {
             display: none;
         }
-        #subscribeBtn {
-            background-color: #ff0000;
-            color: white;
-            padding: 15px 30px;
-            font-size: 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        #unlockLink {
-            font-size: 20px;
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
-    <h1>Unlock Your Special Link</h1>
-    <p>To proceed, please subscribe to the YouTube channel:</p>
-    <a href="https://www.youtube.com/@TagcLa" target="_blank">
-        <button id="subscribeBtn">Subscribe to Channel</button>
-    </a>
-    
-    <p id="message">Once you have subscribed, wait 5 seconds to unlock the link.</p>
-    <div id="unlockLink" class="hidden">
-        <p>Thank you for subscribing! Here’s your unlocked link:</p>
-        <a href="https://pastebin.com/raw/CpBjv0Vm" target="_blank">Click here to access the content</a>
+    <h1>Key System</h1>
+    <div class="container">
+        <p>Follow these steps to get your key:</p>
+        <button class="btn" id="youtube-btn" onclick="openLink('https://www.youtube.com/@GravityFE')">Subscribe to YouTube</button>
+        <button class="btn" id="roblox-btn" onclick="openLink('https://www.roblox.com/users/3454777457/profile')">Follow on Roblox</button>
+        <button class="btn hidden" id="get-key-btn" onclick="getKey()">Get Key</button>
     </div>
-
     <script>
-        document.getElementById("subscribeBtn").addEventListener("click", function() {
-            document.getElementById("message").textContent = "Waiting for 5 seconds...";
-            setTimeout(function() {
-                document.getElementById("unlockLink").classList.remove("hidden");
-                document.getElementById("message").textContent = "You have successfully unlocked the link!";
-            }, 5000); // 5 seconds delay
-        });
+        let visitedYouTube = false;
+        let visitedRoblox = false;
+        
+        function openLink(url) {
+            window.open(url, '_blank');
+            setTimeout(() => {
+                if (url.includes('youtube')) visitedYouTube = true;
+                if (url.includes('roblox')) visitedRoblox = true;
+                checkCompletion();
+            }, 15000);
+        }
+
+        function checkCompletion() {
+            if (visitedYouTube && visitedRoblox) {
+                document.getElementById('get-key-btn').classList.remove('hidden');
+            }
+        }
+
+        function getKey() {
+            window.location.href = 'https://pastebin.com/raw/CpBjv0Vm';
+        }
     </script>
 </body>
 </html>
